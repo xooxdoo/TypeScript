@@ -5588,6 +5588,15 @@ namespace ts {
             // ImportsList:
             //  ImportSpecifier
             //  ImportsList, ImportSpecifier
+
+            // ExportClause:
+            //  { }
+            //  { ExportsList }
+            //  { ExportsList, }
+
+            //  ExportsList:
+            //   ExportSpecifier
+            //   ExportsList, ExportSpecifier
             node.elements = parseBracketedList(ParsingContext.ImportOrExportSpecifiers,
                 kind === SyntaxKind.NamedImports ? parseImportSpecifier : parseExportSpecifier,
                 SyntaxKind.OpenBraceToken, SyntaxKind.CloseBraceToken);
