@@ -1,60 +1,57 @@
-tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(5,18): error TS2687: Cannot change type of property 'a' from 'number' to 'string'.
-tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(6,33): error TS2687: Cannot change type of property 'a' from 'string' to 'number'.
-tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(7,21): error TS2687: Cannot change type of property 'a' from 'number' to 'string'.
-tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(7,21): error TS2687: Cannot change type of property 'b' from 'string' to 'number'.
-tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(10,5): error TS2687: Cannot change type of property 'c' from 'string' to 'number'.
-tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(13,15): error TS2686: Spread properties must be identifiers, property accesses, or object literals.
-tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(14,15): error TS2686: Spread properties must be identifiers, property accesses, or object literals.
-tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(17,20): error TS2300: Duplicate identifier 'b'.
+tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(5,18): error TS2694: Cannot change type of property 'a' from 'number' to 'string'.
+tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(6,33): error TS2694: Cannot change type of property 'a' from 'string' to 'number'.
+tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(7,21): error TS2694: Cannot change type of property 'a' from 'number' to 'string'.
+tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(7,21): error TS2694: Cannot change type of property 'b' from 'string' to 'number'.
+tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(10,5): error TS2694: Cannot change type of property 'c' from 'string' to 'number'.
+tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(13,15): error TS2693: Spread properties must be identifiers, property accesses, or object literals.
+tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(14,15): error TS2693: Spread properties must be identifiers, property accesses, or object literals.
 tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(17,36): error TS2300: Duplicate identifier 'b'.
-tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(17,49): error TS2687: Cannot change type of property 'a' from 'number' to 'string'.
+tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(17,49): error TS2694: Cannot change type of property 'a' from 'number' to 'string'.
 tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(17,53): error TS2300: Duplicate identifier 'b'.
-tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(20,23): error TS2688: Cannot spread property 'b' because it does not have a 'get' accessor.
+tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts(20,23): error TS2695: Cannot spread property 'b' because it does not have a 'get' accessor.
 
 
-==== tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts (12 errors) ====
+==== tests/cases/conformance/es6/destructuring/objectSpreadElementNegative.ts (11 errors) ====
     let o = { a: 1, b: 'no' };
     let swap = { a: 'yes', b: -1 };
     
     // new field's type conflicts with existing field
     let o2 = { ...o, a: 'wrong type?' }
                      ~
-!!! error TS2687: Cannot change type of property 'a' from 'number' to 'string'.
+!!! error TS2694: Cannot change type of property 'a' from 'number' to 'string'.
     let o3 = { a: 'wrong type?', ...o }
                                     ~
-!!! error TS2687: Cannot change type of property 'a' from 'string' to 'number'.
+!!! error TS2694: Cannot change type of property 'a' from 'string' to 'number'.
     let o4 = { ...o, ...swap };
                         ~~~~
-!!! error TS2687: Cannot change type of property 'a' from 'number' to 'string'.
+!!! error TS2694: Cannot change type of property 'a' from 'number' to 'string'.
                         ~~~~
-!!! error TS2687: Cannot change type of property 'b' from 'string' to 'number'.
+!!! error TS2694: Cannot change type of property 'b' from 'string' to 'number'.
     let combinedNested = {
         ...{ a: 1, ...{ b: false, c: 'overriden' } },
         c: -1 // error, number not assignable to string
         ~
-!!! error TS2687: Cannot change type of property 'c' from 'string' to 'number'.
+!!! error TS2694: Cannot change type of property 'c' from 'string' to 'number'.
     }
     // expressions are not allowed
     let o5 = { ...1 + 1 };
                   ~~~~~
-!!! error TS2686: Spread properties must be identifiers, property accesses, or object literals.
+!!! error TS2693: Spread properties must be identifiers, property accesses, or object literals.
     let o6 = { ...(1 + 1) };
                   ~~~~~~~
-!!! error TS2686: Spread properties must be identifiers, property accesses, or object literals.
+!!! error TS2693: Spread properties must be identifiers, property accesses, or object literals.
     
     // repeats are not allowed
     let duplicated = { b: 'bad', ...o, b: 'bad', ...o2, b: 'bad' }
-                       ~
-!!! error TS2300: Duplicate identifier 'b'.
                                        ~
 !!! error TS2300: Duplicate identifier 'b'.
                                                     ~~
-!!! error TS2687: Cannot change type of property 'a' from 'number' to 'string'.
+!!! error TS2694: Cannot change type of property 'a' from 'number' to 'string'.
                                                         ~
 !!! error TS2300: Duplicate identifier 'b'.
     
     // spreading write-only properties is not allowed
     let setterOnly = { ...{ set b (bad: number) { } } };
                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!!! error TS2688: Cannot spread property 'b' because it does not have a 'get' accessor.
+!!! error TS2695: Cannot spread property 'b' because it does not have a 'get' accessor.
     

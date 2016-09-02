@@ -26,7 +26,7 @@ let spreadNull = { ...null }
 let spreadUndefined = { ...undefined }
 
 // methods are not enumerable
-class C { m() { } };
+class C { p = 1; m() { } };
 let c: C = new C();
 let spreadC = {...c};
 
@@ -47,6 +47,23 @@ let computedAfter = {
     b: 'yeah',
     ['at the end']: 14
 }
+
+// generics
+function f<T, U>(t: T, u: U) {
+    return { id: 'id', ...t, ...u };
+}
+let exclusive: { id: string, a: number, b: string, c: string, d: boolean } =
+    f({ a: 1, b: 'yes' }, { c: 'no', d: false });
+let overlap: { id: string, a: number, b: string } =
+    f({ a: 1 }, { a: 2, b: 'extra' });
+let overlapConflict: { id:string, a: number & string } =
+    f({ a: 1 }, { a: 'mismatch' });
+let overwriteId: { id: string, a: number, d: string } =
+    f({ a: 1, id: 'overwritten' }, { c: 1, d: 'no' });
+
+class D { m() { }; q = 2; }
+let classesAreWrong: /*{ id: string, ...C., ...D }*/ =
+    f(new C(), new D());
 
 
 //// [objectSpreadElement.js]
@@ -83,6 +100,7 @@ var spreadUndefined = __assign({}, undefined);
 // methods are not enumerable
 var C = (function () {
     function C() {
+        this.p = 1;
     }
     C.prototype.m = function () { };
     return C;
@@ -109,4 +127,21 @@ var computedAfter = (_c = __assign({}, o, {
     _c['at the end'] = 14,
     _c
 );
+// generics
+function f(t, u) {
+    return __assign({id: 'id'}, t, u);
+}
+var exclusive = f({ a: 1, b: 'yes' }, { c: 'no', d: false });
+var overlap = f({ a: 1 }, { a: 2, b: 'extra' });
+var overlapConflict = f({ a: 1 }, { a: 'mismatch' });
+var overwriteId = f({ a: 1, id: 'overwritten' }, { c: 1, d: 'no' });
+var D = (function () {
+    function D() {
+        this.q = 2;
+    }
+    D.prototype.m = function () { };
+    ;
+    return D;
+}());
+var classesAreWrong = f(new C(), new D());
 var _a, _b, _c;
