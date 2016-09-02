@@ -16,12 +16,12 @@ interface Array<T> {
       * Returns the index of the first element in the array where predicate is true, and undefined
       * otherwise.
       * @param predicate find calls predicate once for each element of the array, in ascending
-      * order, until it finds one where predicate returns true. If such an element is found, find
-      * immediately returns that element value. Otherwise, find returns undefined.
+      * order, until it finds one where predicate returns true. If such an element is found, 
+      * findIndex immediately returns that element index. Otherwise, findIndex returns -1.
       * @param thisArg If provided, it will be used as the this value for each invocation of
       * predicate. If it is not provided, undefined is used instead.
       */
-    findIndex(predicate: (value: T) => boolean, thisArg?: any): number | undefined;
+    findIndex(predicate: (value: T) => boolean, thisArg?: any): number;
 
     /**
       * Returns the this object after filling the section identified by start and end with value
@@ -31,7 +31,7 @@ interface Array<T> {
       * @param end index to stop filling the array at. If end is negative, it is treated as
       * length+end.
       */
-    fill(value: T, start?: number, end?: number): T[];
+    fill(value: T, start?: number, end?: number): this;
 
     /**
       * Returns the this object after copying a section of the array identified by start and end
@@ -42,7 +42,7 @@ interface Array<T> {
       * is treated as length+end.
       * @param end If not specified, length of the this object is used as its default value.
       */
-    copyWithin(target: number, start: number, end?: number): T[];
+    copyWithin(target: number, start: number, end?: number): this;
 }
 
 interface ArrayConstructor {
@@ -66,6 +66,10 @@ interface ArrayConstructor {
       * @param items A set of elements to include in the new array object.
       */
     of<T>(...items: T[]): Array<T>;
+}
+
+interface DateConstructor {
+    new (value: Date): Date;
 }
 
 interface Function {
@@ -226,7 +230,7 @@ interface NumberConstructor {
     /**
       * The value of the largest integer n such that n and n + 1 are both exactly representable as
       * a Number value.
-      * The value of Number.MIN_SAFE_INTEGER is 9007199254740991 2^53 − 1.
+      * The value of Number.MAX_SAFE_INTEGER is 9007199254740991 2^53 − 1.
       */
     readonly MAX_SAFE_INTEGER: number;
 
@@ -343,6 +347,30 @@ interface ObjectConstructor {
     defineProperty(o: any, propertyKey: PropertyKey, attributes: PropertyDescriptor): any;
 }
 
+interface ReadonlyArray<T> {
+  /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+    * otherwise.
+    * @param predicate find calls predicate once for each element of the array, in ascending
+    * order, until it finds one where predicate returns true. If such an element is found, find
+    * immediately returns that element value. Otherwise, find returns undefined.
+    * @param thisArg If provided, it will be used as the this value for each invocation of
+    * predicate. If it is not provided, undefined is used instead.
+    */
+  find(predicate: (value: T, index: number, obj: ReadonlyArray<T>) => boolean, thisArg?: any): T | undefined;
+
+  /**
+    * Returns the index of the first element in the array where predicate is true, and undefined
+    * otherwise.
+    * @param predicate find calls predicate once for each element of the array, in ascending
+    * order, until it finds one where predicate returns true. If such an element is found, 
+    * findIndex immediately returns that element index. Otherwise, findIndex returns -1.
+    * @param thisArg If provided, it will be used as the this value for each invocation of
+    * predicate. If it is not provided, undefined is used instead.
+    */
+  findIndex(predicate: (value: T) => boolean, thisArg?: any): number;
+}
+
 interface RegExp {
     /**
       * Returns a string indicating the flags of the regular expression in question. This field is read-only.
@@ -401,6 +429,14 @@ interface String {
       * endPosition – length(this). Otherwise returns false.
       */
     endsWith(searchString: string, endPosition?: number): boolean;
+
+    /**
+      * Returns the String value result of normalizing the string into the normalization form
+      * named by form as specified in Unicode Standard Annex #15, Unicode Normalization Forms.
+      * @param form Applicable values: "NFC", "NFD", "NFKC", or "NFKD", If not specified default
+      * is "NFC"
+      */
+    normalize(form: "NFC" | "NFD" | "NFKC" | "NFKD"): string;
 
     /**
       * Returns the String value result of normalizing the string into the normalization form

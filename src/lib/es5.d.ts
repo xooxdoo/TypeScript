@@ -137,11 +137,23 @@ interface ObjectConstructor {
     getOwnPropertyNames(o: any): string[];
 
     /**
+      * Creates an object that has null prototype.
+      * @param o Object to use as a prototype. May be null
+      */
+    create(o: null): any;
+
+    /**
+      * Creates an object that has the specified prototype, and that optionally contains specified properties.
+      * @param o Object to use as a prototype. May be null
+      */
+    create<T>(o: T): T;
+
+    /**
       * Creates an object that has the specified prototype, and that optionally contains specified properties.
       * @param o Object to use as a prototype. May be null
       * @param properties JavaScript object that contains one or more property descriptors.
       */
-    create(o: any, properties?: PropertyDescriptorMap): any;
+    create(o: any, properties: PropertyDescriptorMap): any;
 
     /**
       * Adds a property to an object, or modifies attributes of an existing property.
@@ -501,8 +513,8 @@ interface NumberConstructor {
 /** An object that represents a number of any kind. All JavaScript numbers are 64-bit floating-point numbers. */
 declare const Number: NumberConstructor;
 
-interface TemplateStringsArray extends Array<string> {
-    readonly raw: string[];
+interface TemplateStringsArray extends ReadonlyArray<string> {
+    readonly raw: ReadonlyArray<string>
 }
 
 interface Math {
@@ -864,6 +876,7 @@ declare const RegExp: RegExpConstructor;
 interface Error {
     name: string;
     message: string;
+    stack?: string;
 }
 
 interface ErrorConstructor {
@@ -951,35 +964,19 @@ interface JSON {
     /**
       * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
       * @param value A JavaScript value, usually an object or array, to be converted.
-      */
-    stringify(value: any): string;
-    /**
-      * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
-      * @param value A JavaScript value, usually an object or array, to be converted.
-      * @param replacer A function that transforms the results.
-      */
-    stringify(value: any, replacer: (key: string, value: any) => any): string;
-    /**
-      * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
-      * @param value A JavaScript value, usually an object or array, to be converted.
-      * @param replacer Array that transforms the results.
-      */
-    stringify(value: any, replacer: any[]): string;
-    /**
-      * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
-      * @param value A JavaScript value, usually an object or array, to be converted.
       * @param replacer A function that transforms the results.
       * @param space Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read.
       */
-    stringify(value: any, replacer: (key: string, value: any) => any, space: string | number): string;
+    stringify(value: any, replacer?: (key: string, value: any) => any, space?: string | number): string;
     /**
       * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
       * @param value A JavaScript value, usually an object or array, to be converted.
-      * @param replacer Array that transforms the results.
+      * @param replacer An array of strings and numbers that acts as a approved list for selecting the object properties that will be stringified.
       * @param space Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read.
       */
-    stringify(value: any, replacer: any[], space: string | number): string;
+    stringify(value: any, replacer?: (number | string)[] | null, space?: string | number): string;
 }
+
 /**
   * An intrinsic object that provides functions to convert JavaScript values to and from the JavaScript Object Notation (JSON) format.
   */
@@ -1009,7 +1006,12 @@ interface ReadonlyArray<T> {
       * Combines two or more arrays.
       * @param items Additional items to add to the end of array1.
       */
-    concat(...items: T[]): T[];
+    concat(...items: T[][]): T[];
+    /**
+      * Combines two or more arrays.
+      * @param items Additional items to add to the end of array1.
+      */
+    concat(...items: (T | T[])[]): T[];
     /**
       * Adds all the elements of an array separated by the specified separator string.
       * @param separator A string used to separate one element of an array from the next in the resulting String. If omitted, the array elements are separated with a comma.
@@ -1115,6 +1117,11 @@ interface Array<T> {
       * Combines two or more arrays.
       * @param items Additional items to add to the end of array1.
       */
+    concat(...items: T[][]): T[];
+    /**
+      * Combines two or more arrays.
+      * @param items Additional items to add to the end of array1.
+      */
     concat(...items: (T | T[])[]): T[];
     /**
       * Adds all the elements of an array separated by the specified separator string.
@@ -1139,7 +1146,7 @@ interface Array<T> {
       * Sorts an array.
       * @param compareFn The name of the function used to determine the order of the elements. If omitted, the elements are sorted in ascending, ASCII character order.
       */
-    sort(compareFn?: (a: T, b: T) => number): T[];
+    sort(compareFn?: (a: T, b: T) => number): this;
     /**
       * Removes elements from an array and, if necessary, inserts new elements in their place, returning the deleted elements.
       * @param start The zero-based location in the array from which to start removing elements.
@@ -1481,7 +1488,7 @@ interface Int8Array {
       * is treated as length+end.
       * @param end If not specified, length of the this object is used as its default value.
       */
-    copyWithin(target: number, start: number, end?: number): Int8Array;
+    copyWithin(target: number, start: number, end?: number): this;
 
     /**
       * Determines whether all the members of an array satisfy the specified test.
@@ -1501,7 +1508,7 @@ interface Int8Array {
         * @param end index to stop filling the array at. If end is negative, it is treated as
         * length+end.
         */
-    fill(value: number, start?: number, end?: number): Int8Array;
+    fill(value: number, start?: number, end?: number): this;
 
     /**
       * Returns the elements of an array that meet the condition specified in a callback function.
@@ -1527,12 +1534,12 @@ interface Int8Array {
       * Returns the index of the first element in the array where predicate is true, and undefined
       * otherwise.
       * @param predicate find calls predicate once for each element of the array, in ascending
-      * order, until it finds one where predicate returns true. If such an element is found, find
-      * immediately returns that element value. Otherwise, find returns undefined.
+      * order, until it finds one where predicate returns true. If such an element is found,
+      * findIndex immediately returns that element index. Otherwise, findIndex returns -1.
       * @param thisArg If provided, it will be used as the this value for each invocation of
       * predicate. If it is not provided, undefined is used instead.
       */
-    findIndex(predicate: (value: number) => boolean, thisArg?: any): number | undefined;
+    findIndex(predicate: (value: number) => boolean, thisArg?: any): number;
 
     /**
       * Performs the specified action for each element in an array.
@@ -1670,7 +1677,7 @@ interface Int8Array {
       * @param compareFn The name of the function used to determine the order of the elements. If
       * omitted, the elements are sorted in ascending, ASCII character order.
       */
-    sort(compareFn?: (a: number, b: number) => number): Int8Array;
+    sort(compareFn?: (a: number, b: number) => number): this;
 
     /**
       * Gets a new Int8Array view of the ArrayBuffer store for this array, referencing the elements
@@ -1754,7 +1761,7 @@ interface Uint8Array {
       * is treated as length+end.
       * @param end If not specified, length of the this object is used as its default value.
       */
-    copyWithin(target: number, start: number, end?: number): Uint8Array;
+    copyWithin(target: number, start: number, end?: number): this;
 
     /**
       * Determines whether all the members of an array satisfy the specified test.
@@ -1774,7 +1781,7 @@ interface Uint8Array {
         * @param end index to stop filling the array at. If end is negative, it is treated as
         * length+end.
         */
-    fill(value: number, start?: number, end?: number): Uint8Array;
+    fill(value: number, start?: number, end?: number): this;
 
     /**
       * Returns the elements of an array that meet the condition specified in a callback function.
@@ -1800,12 +1807,12 @@ interface Uint8Array {
       * Returns the index of the first element in the array where predicate is true, and undefined
       * otherwise.
       * @param predicate find calls predicate once for each element of the array, in ascending
-      * order, until it finds one where predicate returns true. If such an element is found, find
-      * immediately returns that element value. Otherwise, find returns undefined.
+      * order, until it finds one where predicate returns true. If such an element is found,
+      * findIndex immediately returns that element index. Otherwise, findIndex returns -1.
       * @param thisArg If provided, it will be used as the this value for each invocation of
       * predicate. If it is not provided, undefined is used instead.
       */
-    findIndex(predicate: (value: number) => boolean, thisArg?: any): number | undefined;
+    findIndex(predicate: (value: number) => boolean, thisArg?: any): number;
 
     /**
       * Performs the specified action for each element in an array.
@@ -1943,7 +1950,7 @@ interface Uint8Array {
       * @param compareFn The name of the function used to determine the order of the elements. If
       * omitted, the elements are sorted in ascending, ASCII character order.
       */
-    sort(compareFn?: (a: number, b: number) => number): Uint8Array;
+    sort(compareFn?: (a: number, b: number) => number): this;
 
     /**
       * Gets a new Uint8Array view of the ArrayBuffer store for this array, referencing the elements
@@ -2028,7 +2035,7 @@ interface Uint8ClampedArray {
       * is treated as length+end.
       * @param end If not specified, length of the this object is used as its default value.
       */
-    copyWithin(target: number, start: number, end?: number): Uint8ClampedArray;
+    copyWithin(target: number, start: number, end?: number): this;
 
     /**
       * Determines whether all the members of an array satisfy the specified test.
@@ -2048,7 +2055,7 @@ interface Uint8ClampedArray {
         * @param end index to stop filling the array at. If end is negative, it is treated as
         * length+end.
         */
-    fill(value: number, start?: number, end?: number): Uint8ClampedArray;
+    fill(value: number, start?: number, end?: number): this;
 
     /**
       * Returns the elements of an array that meet the condition specified in a callback function.
@@ -2074,12 +2081,12 @@ interface Uint8ClampedArray {
       * Returns the index of the first element in the array where predicate is true, and undefined
       * otherwise.
       * @param predicate find calls predicate once for each element of the array, in ascending
-      * order, until it finds one where predicate returns true. If such an element is found, find
-      * immediately returns that element value. Otherwise, find returns undefined.
+      * order, until it finds one where predicate returns true. If such an element is found,
+      * findIndex immediately returns that element index. Otherwise, findIndex returns -1.
       * @param thisArg If provided, it will be used as the this value for each invocation of
       * predicate. If it is not provided, undefined is used instead.
       */
-    findIndex(predicate: (value: number) => boolean, thisArg?: any): number | undefined;
+    findIndex(predicate: (value: number) => boolean, thisArg?: any): number;
 
     /**
       * Performs the specified action for each element in an array.
@@ -2217,7 +2224,7 @@ interface Uint8ClampedArray {
       * @param compareFn The name of the function used to determine the order of the elements. If
       * omitted, the elements are sorted in ascending, ASCII character order.
       */
-    sort(compareFn?: (a: number, b: number) => number): Uint8ClampedArray;
+    sort(compareFn?: (a: number, b: number) => number): this;
 
     /**
       * Gets a new Uint8ClampedArray view of the ArrayBuffer store for this array, referencing the elements
@@ -2301,7 +2308,7 @@ interface Int16Array {
       * is treated as length+end.
       * @param end If not specified, length of the this object is used as its default value.
       */
-    copyWithin(target: number, start: number, end?: number): Int16Array;
+    copyWithin(target: number, start: number, end?: number): this;
 
     /**
       * Determines whether all the members of an array satisfy the specified test.
@@ -2321,7 +2328,7 @@ interface Int16Array {
         * @param end index to stop filling the array at. If end is negative, it is treated as
         * length+end.
         */
-    fill(value: number, start?: number, end?: number): Int16Array;
+    fill(value: number, start?: number, end?: number): this;
 
     /**
       * Returns the elements of an array that meet the condition specified in a callback function.
@@ -2347,12 +2354,12 @@ interface Int16Array {
       * Returns the index of the first element in the array where predicate is true, and undefined
       * otherwise.
       * @param predicate find calls predicate once for each element of the array, in ascending
-      * order, until it finds one where predicate returns true. If such an element is found, find
-      * immediately returns that element value. Otherwise, find returns undefined.
+      * order, until it finds one where predicate returns true. If such an element is found,
+      * findIndex immediately returns that element index. Otherwise, findIndex returns -1.
       * @param thisArg If provided, it will be used as the this value for each invocation of
       * predicate. If it is not provided, undefined is used instead.
       */
-    findIndex(predicate: (value: number) => boolean, thisArg?: any): number | undefined;
+    findIndex(predicate: (value: number) => boolean, thisArg?: any): number;
 
     /**
       * Performs the specified action for each element in an array.
@@ -2490,7 +2497,7 @@ interface Int16Array {
       * @param compareFn The name of the function used to determine the order of the elements. If
       * omitted, the elements are sorted in ascending, ASCII character order.
       */
-    sort(compareFn?: (a: number, b: number) => number): Int16Array;
+    sort(compareFn?: (a: number, b: number) => number): this;
 
     /**
       * Gets a new Int16Array view of the ArrayBuffer store for this array, referencing the elements
@@ -2575,7 +2582,7 @@ interface Uint16Array {
       * is treated as length+end.
       * @param end If not specified, length of the this object is used as its default value.
       */
-    copyWithin(target: number, start: number, end?: number): Uint16Array;
+    copyWithin(target: number, start: number, end?: number): this;
 
     /**
       * Determines whether all the members of an array satisfy the specified test.
@@ -2595,7 +2602,7 @@ interface Uint16Array {
         * @param end index to stop filling the array at. If end is negative, it is treated as
         * length+end.
         */
-    fill(value: number, start?: number, end?: number): Uint16Array;
+    fill(value: number, start?: number, end?: number): this;
 
     /**
       * Returns the elements of an array that meet the condition specified in a callback function.
@@ -2621,12 +2628,12 @@ interface Uint16Array {
       * Returns the index of the first element in the array where predicate is true, and undefined
       * otherwise.
       * @param predicate find calls predicate once for each element of the array, in ascending
-      * order, until it finds one where predicate returns true. If such an element is found, find
-      * immediately returns that element value. Otherwise, find returns undefined.
+      * order, until it finds one where predicate returns true. If such an element is found,
+      * findIndex immediately returns that element index. Otherwise, findIndex returns -1.
       * @param thisArg If provided, it will be used as the this value for each invocation of
       * predicate. If it is not provided, undefined is used instead.
       */
-    findIndex(predicate: (value: number) => boolean, thisArg?: any): number | undefined;
+    findIndex(predicate: (value: number) => boolean, thisArg?: any): number;
 
     /**
       * Performs the specified action for each element in an array.
@@ -2764,7 +2771,7 @@ interface Uint16Array {
       * @param compareFn The name of the function used to determine the order of the elements. If
       * omitted, the elements are sorted in ascending, ASCII character order.
       */
-    sort(compareFn?: (a: number, b: number) => number): Uint16Array;
+    sort(compareFn?: (a: number, b: number) => number): this;
 
     /**
       * Gets a new Uint16Array view of the ArrayBuffer store for this array, referencing the elements
@@ -2848,7 +2855,7 @@ interface Int32Array {
       * is treated as length+end.
       * @param end If not specified, length of the this object is used as its default value.
       */
-    copyWithin(target: number, start: number, end?: number): Int32Array;
+    copyWithin(target: number, start: number, end?: number): this;
 
     /**
       * Determines whether all the members of an array satisfy the specified test.
@@ -2868,7 +2875,7 @@ interface Int32Array {
         * @param end index to stop filling the array at. If end is negative, it is treated as
         * length+end.
         */
-    fill(value: number, start?: number, end?: number): Int32Array;
+    fill(value: number, start?: number, end?: number): this;
 
     /**
       * Returns the elements of an array that meet the condition specified in a callback function.
@@ -2894,12 +2901,12 @@ interface Int32Array {
       * Returns the index of the first element in the array where predicate is true, and undefined
       * otherwise.
       * @param predicate find calls predicate once for each element of the array, in ascending
-      * order, until it finds one where predicate returns true. If such an element is found, find
-      * immediately returns that element value. Otherwise, find returns undefined.
+      * order, until it finds one where predicate returns true. If such an element is found,
+      * findIndex immediately returns that element index. Otherwise, findIndex returns -1.
       * @param thisArg If provided, it will be used as the this value for each invocation of
       * predicate. If it is not provided, undefined is used instead.
       */
-    findIndex(predicate: (value: number) => boolean, thisArg?: any): number | undefined;
+    findIndex(predicate: (value: number) => boolean, thisArg?: any): number;
 
     /**
       * Performs the specified action for each element in an array.
@@ -3037,7 +3044,7 @@ interface Int32Array {
       * @param compareFn The name of the function used to determine the order of the elements. If
       * omitted, the elements are sorted in ascending, ASCII character order.
       */
-    sort(compareFn?: (a: number, b: number) => number): Int32Array;
+    sort(compareFn?: (a: number, b: number) => number): this;
 
     /**
       * Gets a new Int32Array view of the ArrayBuffer store for this array, referencing the elements
@@ -3121,7 +3128,7 @@ interface Uint32Array {
       * is treated as length+end.
       * @param end If not specified, length of the this object is used as its default value.
       */
-    copyWithin(target: number, start: number, end?: number): Uint32Array;
+    copyWithin(target: number, start: number, end?: number): this;
 
     /**
       * Determines whether all the members of an array satisfy the specified test.
@@ -3141,7 +3148,7 @@ interface Uint32Array {
         * @param end index to stop filling the array at. If end is negative, it is treated as
         * length+end.
         */
-    fill(value: number, start?: number, end?: number): Uint32Array;
+    fill(value: number, start?: number, end?: number): this;
 
     /**
       * Returns the elements of an array that meet the condition specified in a callback function.
@@ -3167,12 +3174,12 @@ interface Uint32Array {
       * Returns the index of the first element in the array where predicate is true, and undefined
       * otherwise.
       * @param predicate find calls predicate once for each element of the array, in ascending
-      * order, until it finds one where predicate returns true. If such an element is found, find
-      * immediately returns that element value. Otherwise, find returns undefined.
+      * order, until it finds one where predicate returns true. If such an element is found,
+      * findIndex immediately returns that element index. Otherwise, findIndex returns -1.
       * @param thisArg If provided, it will be used as the this value for each invocation of
       * predicate. If it is not provided, undefined is used instead.
       */
-    findIndex(predicate: (value: number) => boolean, thisArg?: any): number | undefined;
+    findIndex(predicate: (value: number) => boolean, thisArg?: any): number;
 
     /**
       * Performs the specified action for each element in an array.
@@ -3310,7 +3317,7 @@ interface Uint32Array {
       * @param compareFn The name of the function used to determine the order of the elements. If
       * omitted, the elements are sorted in ascending, ASCII character order.
       */
-    sort(compareFn?: (a: number, b: number) => number): Uint32Array;
+    sort(compareFn?: (a: number, b: number) => number): this;
 
     /**
       * Gets a new Uint32Array view of the ArrayBuffer store for this array, referencing the elements
@@ -3394,7 +3401,7 @@ interface Float32Array {
       * is treated as length+end.
       * @param end If not specified, length of the this object is used as its default value.
       */
-    copyWithin(target: number, start: number, end?: number): Float32Array;
+    copyWithin(target: number, start: number, end?: number): this;
 
     /**
       * Determines whether all the members of an array satisfy the specified test.
@@ -3414,7 +3421,7 @@ interface Float32Array {
         * @param end index to stop filling the array at. If end is negative, it is treated as
         * length+end.
         */
-    fill(value: number, start?: number, end?: number): Float32Array;
+    fill(value: number, start?: number, end?: number): this;
 
     /**
       * Returns the elements of an array that meet the condition specified in a callback function.
@@ -3440,12 +3447,12 @@ interface Float32Array {
       * Returns the index of the first element in the array where predicate is true, and undefined
       * otherwise.
       * @param predicate find calls predicate once for each element of the array, in ascending
-      * order, until it finds one where predicate returns true. If such an element is found, find
-      * immediately returns that element value. Otherwise, find returns undefined.
+      * order, until it finds one where predicate returns true. If such an element is found,
+      * findIndex immediately returns that element index. Otherwise, findIndex returns -1.
       * @param thisArg If provided, it will be used as the this value for each invocation of
       * predicate. If it is not provided, undefined is used instead.
       */
-    findIndex(predicate: (value: number) => boolean, thisArg?: any): number | undefined;
+    findIndex(predicate: (value: number) => boolean, thisArg?: any): number;
 
     /**
       * Performs the specified action for each element in an array.
@@ -3583,7 +3590,7 @@ interface Float32Array {
       * @param compareFn The name of the function used to determine the order of the elements. If
       * omitted, the elements are sorted in ascending, ASCII character order.
       */
-    sort(compareFn?: (a: number, b: number) => number): Float32Array;
+    sort(compareFn?: (a: number, b: number) => number): this;
 
     /**
       * Gets a new Float32Array view of the ArrayBuffer store for this array, referencing the elements
@@ -3668,7 +3675,7 @@ interface Float64Array {
       * is treated as length+end.
       * @param end If not specified, length of the this object is used as its default value.
       */
-    copyWithin(target: number, start: number, end?: number): Float64Array;
+    copyWithin(target: number, start: number, end?: number): this;
 
     /**
       * Determines whether all the members of an array satisfy the specified test.
@@ -3688,7 +3695,7 @@ interface Float64Array {
         * @param end index to stop filling the array at. If end is negative, it is treated as
         * length+end.
         */
-    fill(value: number, start?: number, end?: number): Float64Array;
+    fill(value: number, start?: number, end?: number): this;
 
     /**
       * Returns the elements of an array that meet the condition specified in a callback function.
@@ -3714,12 +3721,12 @@ interface Float64Array {
       * Returns the index of the first element in the array where predicate is true, and undefined
       * otherwise.
       * @param predicate find calls predicate once for each element of the array, in ascending
-      * order, until it finds one where predicate returns true. If such an element is found, find
-      * immediately returns that element value. Otherwise, find returns undefined.
+      * order, until it finds one where predicate returns true. If such an element is found,
+      * findIndex immediately returns that element index. Otherwise, findIndex returns -1.
       * @param thisArg If provided, it will be used as the this value for each invocation of
       * predicate. If it is not provided, undefined is used instead.
       */
-    findIndex(predicate: (value: number) => boolean, thisArg?: any): number | undefined;
+    findIndex(predicate: (value: number) => boolean, thisArg?: any): number;
 
     /**
       * Performs the specified action for each element in an array.
@@ -3857,7 +3864,7 @@ interface Float64Array {
       * @param compareFn The name of the function used to determine the order of the elements. If
       * omitted, the elements are sorted in ascending, ASCII character order.
       */
-    sort(compareFn?: (a: number, b: number) => number): Float64Array;
+    sort(compareFn?: (a: number, b: number) => number): this;
 
     /**
       * Gets a new Float64Array view of the ArrayBuffer store for this array, referencing the elements
