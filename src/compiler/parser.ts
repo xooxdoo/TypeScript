@@ -78,6 +78,10 @@ namespace ts {
                     visitNodes(cbNodes, node.modifiers) ||
                     visitNode(cbNode, (<SpreadElement>node).dotDotDotToken) ||
                     visitNode(cbNode, (<SpreadElement>node).target);
+            case SyntaxKind.SpreadTypeElement:
+                return visitNodes(cbNodes, node.decorators) ||
+                    visitNodes(cbNodes, node.modifiers) ||
+                    visitNode(cbNode, (node as SpreadElement).name);
             case SyntaxKind.Parameter:
             case SyntaxKind.PropertyDeclaration:
             case SyntaxKind.PropertySignature:
@@ -2332,6 +2336,11 @@ namespace ts {
             if (token() === SyntaxKind.OpenBracketToken) {
                 return true;
             }
+            // spread elements are type members
+            // TODO: of object types only
+            if (token() === SyntaxKind.DotDotDotToken) {
+                return true;
+            }
             // Try to get the first property-like token following all modifiers
             if (isLiteralPropertyName()) {
                 idToken = token();
@@ -2357,12 +2366,24 @@ namespace ts {
             if (token() === SyntaxKind.NewKeyword && lookAhead(isStartOfConstructSignature)) {
                 return parseSignatureMember(SyntaxKind.ConstructSignature);
             }
+            if (token() === SyntaxKind.DotDotDotToken) {
+                const typeElement = parseSpreadTypeElement();
+                return typeElement;
+            }
             const fullStart = getNodePos();
             const modifiers = parseModifiers();
             if (isIndexSignature()) {
                 return parseIndexSignatureDeclaration(fullStart, /*decorators*/ undefined, modifiers);
             }
             return parsePropertyOrMethodSignature(fullStart, modifiers);
+        }
+
+        function parseSpreadTypeElement() {
+            const element = createNode(SyntaxKind.SpreadTypeElement, scanner.getStartPos()) as TypeElement;
+            parseTokenNode<Node>(); // parse the `...`
+            element.name = parseIdentifier();
+            parseTypeMemberSemicolon();
+            return finishNode(element);
         }
 
         function isStartOfConstructSignature() {

@@ -317,6 +317,7 @@ namespace ts {
         PropertyAssignment,
         ShorthandPropertyAssignment,
         SpreadElement,
+        SpreadTypeElement,
 
 
         // Enum
@@ -595,6 +596,12 @@ namespace ts {
         questionToken?: Node;               // Present on optional property
         type?: TypeNode;                    // Optional type annotation
         initializer?: Expression;           // Optional initializer
+    }
+
+    // @kind(SyntaxKind.SpreadTypeElement)
+    export interface SpreadTypeElement extends TypeElement {
+        // so this is basically a BindingElement almost
+        name: Identifier;
     }
 
     // @kind(SyntaxKind.PropertyDeclaration)
