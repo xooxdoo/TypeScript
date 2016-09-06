@@ -49,7 +49,7 @@ let computedAfter = {
 }
 
 // generics
-function f<T, U>(t: T, u: U) {
+function f<T, U>(t: T, u: U): { id: string, ...T, ...U } {
     return { id: 'id', ...t, ...u };
 }
 let exclusive: { id: string, a: number, b: string, c: string, d: boolean } =

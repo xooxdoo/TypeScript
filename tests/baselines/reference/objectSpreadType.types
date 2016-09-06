@@ -1,0 +1,7 @@
+=== tests/cases/conformance/es6/destructuring/objectSpreadType.ts ===
+var spreads: { id: string, ...T, ...U };
+>spreads : { id: string; }
+>id : string
+>T : any
+>U : any
+
