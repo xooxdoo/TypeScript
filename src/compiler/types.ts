@@ -601,7 +601,7 @@ namespace ts {
     // @kind(SyntaxKind.SpreadTypeElement)
     export interface SpreadTypeElement extends TypeElement {
         // so this is basically a BindingElement almost
-        name: Identifier;
+        type: TypeNode;
     }
 
     // @kind(SyntaxKind.PropertyDeclaration)
@@ -2298,6 +2298,8 @@ namespace ts {
         ContainsAnyFunctionType = 1 << 27,  // Type is or contains object literal type
         ThisType                = 1 << 28,  // This type
         ObjectLiteralPatternWithComputedProperties = 1 << 29,  // Object literal type implied by binding pattern has computed properties
+        Spread                  = 1 << 30,  // Spread types
+        // TODO: Move some types out to make room for Spread.
 
         /* @internal */
         Nullable = Undefined | Null,
@@ -2315,12 +2317,12 @@ namespace ts {
         EnumLike = Enum | EnumLiteral,
         ObjectType = Class | Interface | Reference | Tuple | Anonymous,
         UnionOrIntersection = Union | Intersection,
-        StructuredType = ObjectType | Union | Intersection,
+        StructuredType = ObjectType | Union | Intersection | Spread,
         StructuredOrTypeParameter = StructuredType | TypeParameter,
 
         // 'Narrowable' types are types where narrowing actually narrows.
         // This *should* be every type other than null, undefined, void, and never
-        Narrowable = Any | StructuredType | TypeParameter | StringLike | NumberLike | BooleanLike | ESSymbol,
+        Narrowable = Any | StructuredType | TypeParameter | StringLike | NumberLike | BooleanLike | ESSymbol | Spread,
         NotUnionOrUnit = Any | String | Number | ESSymbol | ObjectType,
         /* @internal */
         RequiresWidening = ContainsWideningType | ContainsObjectLiteral,
@@ -2414,6 +2416,8 @@ namespace ts {
     export interface UnionType extends UnionOrIntersectionType { }
 
     export interface IntersectionType extends UnionOrIntersectionType { }
+
+    export interface SpreadType extends ObjectType { }
 
     /* @internal */
     // An instantiated anonymous type has a target and a mapper

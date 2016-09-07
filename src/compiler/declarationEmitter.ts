@@ -1120,6 +1120,14 @@ namespace ts {
             writeLine();
         }
 
+
+        function emitSpreadTypeElement(type: SpreadTypeElement) {
+            write("...");
+            emitType(type.type);
+            write(";");
+            writeLine();
+        }
+
         function emitVariableDeclaration(node: VariableDeclaration) {
             // If we are emitting property it isn't moduleElement and hence we already know it needs to be emitted
             // so there is no check needed to see if declaration is visible
@@ -1701,6 +1709,8 @@ namespace ts {
                 case SyntaxKind.PropertyDeclaration:
                 case SyntaxKind.PropertySignature:
                     return emitPropertyDeclaration(<PropertyDeclaration>node);
+                case SyntaxKind.SpreadTypeElement:
+                    return emitSpreadTypeElement(node as SpreadTypeElement);
                 case SyntaxKind.EnumMember:
                     return emitEnumMemberDeclaration(<EnumMember>node);
                 case SyntaxKind.ExportAssignment:

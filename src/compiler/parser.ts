@@ -79,9 +79,7 @@ namespace ts {
                     visitNode(cbNode, (<SpreadElement>node).dotDotDotToken) ||
                     visitNode(cbNode, (<SpreadElement>node).target);
             case SyntaxKind.SpreadTypeElement:
-                return visitNodes(cbNodes, node.decorators) ||
-                    visitNodes(cbNodes, node.modifiers) ||
-                    visitNode(cbNode, (node as SpreadElement).name);
+                return visitNode(cbNode, (node as SpreadTypeElement).type);
             case SyntaxKind.Parameter:
             case SyntaxKind.PropertyDeclaration:
             case SyntaxKind.PropertySignature:
@@ -2367,8 +2365,7 @@ namespace ts {
                 return parseSignatureMember(SyntaxKind.ConstructSignature);
             }
             if (token() === SyntaxKind.DotDotDotToken) {
-                const typeElement = parseSpreadTypeElement();
-                return typeElement;
+                return parseSpreadTypeElement();
             }
             const fullStart = getNodePos();
             const modifiers = parseModifiers();
@@ -2379,9 +2376,9 @@ namespace ts {
         }
 
         function parseSpreadTypeElement() {
-            const element = createNode(SyntaxKind.SpreadTypeElement, scanner.getStartPos()) as TypeElement;
-            parseTokenNode<Node>(); // parse the `...`
-            element.name = parseIdentifier();
+            const element = createNode(SyntaxKind.SpreadTypeElement, scanner.getStartPos()) as SpreadTypeElement;
+            parseTokenNode<Node>(); // parse `...`
+            element.type = parseType();
             parseTypeMemberSemicolon();
             return finishNode(element);
         }
